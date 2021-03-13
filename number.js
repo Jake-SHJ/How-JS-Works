@@ -44,3 +44,14 @@ function deconstruct(number) {
     number,
   };
 }
+
+console.log("MAX_SAFE_INTEGER: ", deconstruct(Number.MAX_SAFE_INTEGER));
+console.log("1: ", deconstruct(1));
+console.log("0.1: ", deconstruct(0.1)); // { sign: 1, coefficient: 7205759403792794, exponent: -56, number: 0.1 } 지수, 계수를 넣어서 계산하면 0.1이 아니다.
+
+console.log("0.1 + 0.2: ", deconstruct(0.1 + 0.2));
+console.log("0.3: ", deconstruct(0.3)); // 둘 다 0.3이 아니다.
+
+console.log("100 / 3: ", deconstruct(100 / 3)); // 33.333333333333336
+
+// 10진 소수점 값을 신뢰할 수 없다.
