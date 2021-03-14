@@ -81,3 +81,34 @@ function mint(proto_big_integer) {
   }
   return Object.freeze(proto_big_integer);
 }
+
+// 부호 변경
+function neg(big) {
+  if (is_zero) {
+    return zero;
+  }
+  let negation = big.slice();
+  negation[sign] = is_negative(big) ? plus : minus;
+  return mint(negation);
+}
+
+// 절댓값
+function abs(big) {
+  return is_zero(big) ? zero : is_negative(big) ? neg(big) : big;
+}
+
+// 부호 추출
+function signum(big) {
+  return is_zero(big) ? zero : is_negative(big) ? negative_wun : wun;
+}
+
+// 동일 값 판별
+function eq(comparehend, comparator) {
+  return (
+    comparehend === comparator ||
+    (comparehend.length === comparator.length &&
+      comparehend.every(function (element, element_nr) {
+        return element === comparator[element_nr];
+      }))
+  );
+}
