@@ -103,12 +103,52 @@ function signum(big) {
 }
 
 // 동일 값 판별
-function eq(comparehend, comparator) {
+function eq(comparahend, comparator) {
   return (
-    comparehend === comparator ||
-    (comparehend.length === comparator.length &&
-      comparehend.every(function (element, element_nr) {
+    comparahend === comparator ||
+    (comparahend.length === comparator.length &&
+      comparahend.every(function (element, element_nr) {
         return element === comparator[element_nr];
       }))
   );
+}
+
+// absolute less than, 절댓값이 다른 수의 절댓값보다 작은지 판별
+function abs_lt(comparahend, comparator) {
+  return comparahend.length === comparator.length // 동일한 개수의 메가디지트를 가지고 있다면
+    ? comparahend.reduce(function (reduction, element, element_nr) {
+        // 각 메가디지트 값을 비교
+        if (element_nr !== sign) {
+          const other = comparator[element_nr];
+          if (element !== other) {
+            return element < other;
+          }
+        }
+        return reduction;
+      }, false)
+    : comparahend.length < comparator.length; // 더 많은 메가디지트를 가진 숫자가 더 큰 숫자
+}
+
+// less than
+function lt(comparahend, comparator) {
+  return comparahend[sign] !== comparator[sign]
+    ? is_negative(comparahend)
+    : is_negative(comparahend)
+    ? abs_lt(comparator, comparahend)
+    : abs_lt(comparahend, comparator);
+}
+
+// greater than or equal
+function ge(a, b) {
+  return !lt(a, b);
+}
+
+// greater than
+function gt(a, b) {
+  return lt(b, a);
+}
+
+// less than or equal
+function le(a, b) {
+  return !lt(b, a);
 }
