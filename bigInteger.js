@@ -315,3 +315,23 @@ function mask(nr_bits) {
 function not(a, nr_bits) {
   return xor(a, mask(nr_bits));
 }
+
+// 임의의 큰 정수 생성
+// 생성할 비트 개수, 난수 생성기(없으면 Math.random)를 인자로 받는다.
+function random(nr_bits, random = Math.random) {
+  // 비트 1로 만들어진 문자열 생성
+  const wuns = mask(nr_bits);
+  if (wuns !== undefined) {
+    // 각 메가디지트에 해당하는 0.0과 1.0 사이의 난수를 생성
+    return mint(
+      wuns.map(function (element, element_nr) {
+        if (element_nr === sign) {
+          return plus;
+        }
+        const bits = random();
+        // 몇 개의 상위 비트와 하위 비트를 골라서 서로 xor, 그다음 메가디지트와 & 연산하여 새로운 숫자에 추가
+        return ((bits * radix_squared) ^ (bits * radix)) & element;
+      })
+    );
+  }
+}
