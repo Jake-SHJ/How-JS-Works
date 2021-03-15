@@ -335,3 +335,43 @@ function random(nr_bits, random = Math.random) {
     );
   }
 }
+
+// 덧셈
+// 더하기에 자리 올림수를 제공하기 위해 클로저 사용
+function add(augend, addend) {
+  if (is_zero(augend)) {
+    return addend;
+  }
+  if (is_zero(addend)) {
+    return augend;
+  }
+  // 부호가 다르면 뺄셈이 된다.
+  if (augend[sign] !== addend[sign]) {
+    return sub(augend, neg(addend));
+  }
+  // 부호가 같으면 모든 비트를 더하고 동일한 부호 지정
+  // 길이가 서로 다른 경우, 더 긴 정수쪽에 map을 쓴 다음 || 연산자를 통해 짧은쪽에 존재하지 않는 요소에 0을 적용하여 덧셈 수행
+  if (augend.length < addend.length) {
+    [addend, augend] = [augend, addend];
+  }
+  let carry = 0;
+  let result = augend.map(function (element, element_nr) {
+    if (element_nr !== sign) {
+      element += (addend[element_nr] || 0) + carry;
+      if (element >= radix) {
+        carry = 1;
+        element -= radix;
+      } else {
+        carry = 0;
+      }
+    }
+    return element;
+  });
+  // 숫자가 오버플로우 된 경우, 자리올림수(carry)를 저장할 배열 요소를 추가
+  if (carry > 0) {
+    result.push(carry);
+  }
+  return mint(result);
+}
+
+function sub() {}
