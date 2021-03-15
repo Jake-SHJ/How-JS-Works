@@ -293,3 +293,25 @@ function shift_up(big, places) {
     return mint(result);
   }
 }
+
+// 모든 비트의 보수 생성
+// 숫자를 위한 비트가 무제한 => 얼마나 많은 비트를 뒤집어야하는지 모름
+// mask 함수를 통해 값이 1인 비트를 지정한 개수만큼 가진 큰 정수를 생성
+function mask(nr_bits) {
+  // 값이 1인 비트로만 구성된 문자열 생성
+  nr_bits = int(nr_bits);
+  if (nr_bits !== undefined && nr_bits >= 0) {
+    let mega = Math.floor(nr_bits / log2_radix);
+    let result = new Array(mega + 1).fill(radix - 1);
+    result[sign] = plus;
+    let leftover = nr_bits - mega * log2_radix;
+    if (leftover > 0) {
+      result.push((1 << leftover) - 1);
+    }
+    return mint(result);
+  }
+}
+
+function not(a, nr_bits) {
+  return xor(a, mask(nr_bits));
+}
