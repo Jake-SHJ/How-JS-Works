@@ -219,3 +219,77 @@ function int(big) {
     }
   }
 }
+
+// 최하위 비트를 삭제해서 숫자의 크기를 줄인다. => 큰 정수 값을 더 작게 만든다.
+// 비트를 좌우 방향성(오른쪽 시프트, 왼쪽 시프트)을 가지고 축소, 확대를 표현하는 것은 문제가 있다.
+
+// 축소를 의미하는 down
+function shift_down(big, places) {
+  if (is_zero(big)) {
+    return zero;
+  }
+  places = int(places);
+  if (Number.isSafeInteger(places)) {
+    if (places === 0) {
+      return abs(big);
+    }
+    if (places < 0) {
+      return shift_up(big, -places);
+    }
+    let skip = Math.floor(places / log2_radix);
+    places -= skip * log2_radix;
+    if (skip + 1 >= big.length) {
+      return zero;
+    }
+    big = skip > 0 ? mint(zero.concat(big.slice(skip + 1))) : big;
+    if (places === 0) {
+      return big;
+    }
+    return mint(
+      big.map(function (element, element_nr) {
+        if (element_nr === sign) {
+          return plus;
+        }
+        return (
+          (radix - 1) &
+          ((element >> places) |
+            ((big[element_nr + 1] || 0) << (log2_radix - places)))
+        );
+      })
+    );
+  }
+}
+
+// 최하위 위치에 0을 끼워 넣어 숫자를 증가 => 큰 정수를 더 크게
+function shift_up(big, places) {
+  if (is_zero(big)) {
+    return zero;
+  }
+  places = int(places);
+  if (Number.isSafeInteger(places)) {
+    if (places === 0) {
+      return abs(big);
+    }
+    if (places < 0) {
+      return shift_down(big, -places);
+    }
+    let blanks = Math.floor(places / log2_radix);
+    let result = new Array(blanks + 1).fill(0);
+    result[sign] = plus;
+    places -= blanks * log2_radix;
+    if (places === 0) {
+      return mint(result.concat(big.slice(least)));
+    }
+    let carry = big.reduce(function (accumulator, element, element_nr) {
+      if (element_nr === sign) {
+        return 0;
+      }
+      result.push(((element << places) | accumulator) & (radix - 1));
+      return element >> (log2_radix - places);
+    }, 0);
+    if (carry > 0) {
+      result.push(carry);
+    }
+    return mint(result);
+  }
+}
