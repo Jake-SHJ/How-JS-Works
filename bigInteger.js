@@ -189,3 +189,33 @@ function xor(a, b) {
     })
   );
 }
+
+// int 함수, 작은 정수와 큰 정수 값을 모두 쉽게 처리하는 데 도움
+function int(big) {
+  let result;
+  if (typeof big === "number") {
+    // 안전한 정수면 그대로 반환
+    if (Number.isSafeInteger(big)) {
+      return big;
+    }
+  } else if (is_big_integer(big)) {
+    // 배열 길이에 따른 처리
+    if (big.length < 2) {
+      return 0;
+    }
+    if (big.length === 2) {
+      return is_negative(big) ? -big[least] : big[least];
+    }
+    if (big.length === 3) {
+      result = big[least + 1] * radix + big[least];
+      return is_negative(big) ? -result : result;
+    }
+    if (big.length === 4) {
+      result =
+        big[least + 2] * radix_squared + big[least + 1] * radix + big[least];
+      if (Number.isSafeInteger(result)) {
+        return is_negative(big) ? -result : result;
+      }
+    }
+  }
+}
