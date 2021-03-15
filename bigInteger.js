@@ -152,3 +152,40 @@ function gt(a, b) {
 function le(a, b) {
   return !lt(b, a);
 }
+
+// 비트 연산 함수 and(논리곱), or(논리합), xor(배타적 논리합)
+function and(a, b) {
+  // 짧은 쪽 배열을 a로 한다.
+  if (a.length > b.length) {
+    [a, b] = [b, a];
+  }
+  return mint(
+    a.map(function (element, element_nr) {
+      return element_nr === sign ? plus : element & b[element_nr];
+    })
+  );
+}
+
+function or(a, b) {
+  // 더 긴 배열이 a
+  if (a.length < b.length) {
+    [a, b] = [b, a];
+  }
+  return mint(
+    a.map(function (element, element_nr) {
+      return element_nr === sign ? plus : element | (b[element_nr] || 0);
+    })
+  );
+}
+
+function xor(a, b) {
+  // 더 긴 배열이 a
+  if (a.length < b.length) {
+    [a, b] = [b, a];
+  }
+  return mint(
+    a.map(function (element, element_nr) {
+      return element_nr === sign ? plus : element ^ (b[element_nr] || 0);
+    })
+  );
+}
