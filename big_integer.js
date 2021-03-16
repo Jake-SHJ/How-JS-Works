@@ -408,3 +408,103 @@ function sub(minuend, subtrahend) {
     })
   );
 }
+
+// 곱셈
+// multiplicand(피승수, 곱해지는 수)의 모든 요소를 multiplier(승수, 곱하는 수)의 모든 요소와 곱해야하기 때문에 forEach 사용
+// 24비트를 초과하는 값은 반드시 자리올림수로 처리
+function mul(multiplicand, multiplier) {
+  if (is_zero(multiplicand) || is_zero(multiplier)) {
+    return zero;
+  }
+  // 두 수의 부호가 같다면 결과는 양수
+  let result = [multiplicand[sign] === multiplier[sign] ? plus : minus];
+  // 자리 올림수를 계속 전달하면서 각 요소를 곱한다.
+  multiplicand.forEach(function (
+    multiplicand_element,
+    multiplicand_element_nr
+  ) {
+    if (multiplicand_element_nr !== sign) {
+      let carry = 0;
+      multiplier.forEach(function (multiplier_element, multiplier_element_nr) {
+        let at = multiplicand_element_nr + multiplier_element_nr - 1;
+        let product =
+          multiplicand_element * multiplier_element + (result[at] || 0) + carry;
+        result[at] = product & 16777215;
+        carry = Math.floor(product / radix);
+      });
+      if (carry > 0) {
+        result[multiplicand_element_nr + multiplier.length - 1] = carry;
+      }
+    }
+  });
+  return mint(result);
+}
+
+// 나눗셈
+// divrem은 몫과 나머지 모두 반환, div는 몫만 반환
+function divrem(dividend, divisor) {
+  if (is_zero(dividend) || abs_lt(dividend, divisor)) {
+    return [zero, dividend];
+  }
+  if (is_zero(divisor)) {
+    return undefined;
+  }
+  // 피연사자들을 양수로 전환
+  let quotient_is_negative = dividend[sign] !== divisor[sign];
+  let remainder_is_negative = dividend[sign] === minus;
+  let remainder = dividend;
+  dividend = abs(dividend);
+  divisor = abs(divisor);
+  // 나눗셈 알고리즘
+  let shift = Math.clz32(last(divisor)) - 8;
+
+  dividend = shift_up(dividend, shift);
+  divisor = shift_up(divisor, shift);
+  let place = dividend.length - divisor.length;
+  let dividend_prefix = last(dividend);
+  let divisor_prefix = last(divisor);
+  if (dividend_prefix < divisor_prefix) {
+    dividend_prefix = dividend_prefix * radix + next_to_last(dividend);
+  } else {
+    place += 1;
+  }
+  divisor = shift_up(divisor, (place - 1) * 24);
+  let quotient = new Array(place + 1).fill(0);
+  quotient[sign] = plus;
+  while (true) {
+    let estimated = Math.floor(dividend_prefix / divisor_prefix);
+    if (estimated > 0) {
+      while (true) {
+        let trial = sub(dividend, mul(divisor, [plus, estimated]));
+        if (!is_negative(trial)) {
+          dividend = trial;
+          break;
+        }
+        estimated -= 1;
+      }
+    }
+    quotient[place] = estimated;
+    place -= 1;
+    if (place === 0) {
+      break;
+    }
+    if (is_zero(dividend)) {
+      break;
+    }
+    dividend_prefix = last(dividend) * radix + next_to_last(dividend);
+    divisor = shift_down(divisor, 24);
+  }
+  quotient = mint(quotient);
+  remainder = shift_down(dividend, shift);
+  return [
+    quotient_is_negative ? neg(quotient) : quotient,
+    remainder_is_negative ? neg(remainder) : remainder,
+  ];
+}
+
+function div(dividend, divisor) {
+  let temp = divrem(dividend, divisor);
+  if (temp) {
+    return temp[0];
+  }
+}
