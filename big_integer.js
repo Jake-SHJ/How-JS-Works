@@ -508,3 +508,51 @@ function div(dividend, divisor) {
     return temp[0];
   }
 }
+
+// 거듭 제곱
+function power(big, exponent) {
+  let exp = int(exponent);
+  if (exp === 0) {
+    return wun;
+  }
+  if (is_zero(big)) {
+    return zero;
+  }
+  if (exp === undefined || exp < 0) {
+    return undefined;
+  }
+  let result = wun;
+  while (true) {
+    if ((exp & 1) !== 0) {
+      result = mul(result, big);
+    }
+    exp = Math.floor(exp / 2);
+    if (exp < 1) {
+      break;
+    }
+    big = mul(big, big);
+  }
+  return mint(result);
+}
+
+// 기약분수 생성
+function gcd(a, b) {
+  a = abs(a);
+  b = abs(b);
+  while (!is_zero(b)) {
+    let [ignore, remainder] = divrem(a, b);
+    a = b;
+    b = remainder;
+  }
+  return a;
+}
+
+// 숫자를 문자로 매핑
+const digitset = "0123456789ABCDEFGHJKMNPQRSTVWXYZ*~$=U";
+// 문자를 숫자로 매핑
+const charset = (function (object) {
+  digitset.split("").forEach(function (element, element_nr) {
+    object[element] = element_nr;
+  });
+  return Object.freeze(object);
+})(Object.create(null));
