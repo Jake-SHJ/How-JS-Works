@@ -556,3 +556,91 @@ const charset = (function (object) {
   });
   return Object.freeze(object);
 })(Object.create(null));
+
+// 숫자나 문자열, 그리고 선택적으로 기수 값을 받아서 큰 정수 값을 반환
+function make(value, radix_2_37) {
+  // value = 문자열, 정수, 큰 정수, 만약 문자열이면 부수적으로 기수값 지정
+  let result;
+  // 문자열
+  if (typeof value === "string") {
+    let radish;
+    if (radix_2_37 === undefined) {
+      radix_2_37 = 10;
+      radish = ten;
+    } else {
+      if (!Number.isInteger(radix_2_37) || radix_2_37 < 2 || radix_2_37 > 37) {
+        return undefined;
+      }
+      radish = make(radix_2_37);
+    }
+    result = zero;
+    let good = false;
+    let negative = false;
+    if (
+      value
+        .toUpperCase()
+        .split("")
+        .every(function (element, element_nr) {
+          let digit = charset[element];
+          if (digit !== undefined && digit < radix_2_37) {
+            result = add(mul(result, radish), [plus, digit]);
+            good = true;
+            return true;
+          }
+          if (element_nr === sign) {
+            if (element === plus) {
+              return true;
+            }
+            if (element === minus) {
+              negative = true;
+              return true;
+            }
+          }
+          return digit === "_";
+        }) &&
+      good
+    ) {
+      if (negative) {
+        result = neg(result);
+      }
+      return mint(result);
+    }
+    return undefined;
+  }
+  // 정수
+  if (Number.isInteger(value)) {
+    let whole = Math.abs(value);
+    result = [value < 0 ? minus : plus];
+    while (whole >= radix) {
+      let quotient = Math.floor(whole / radix);
+      result.push(whole - quotient * radix);
+      whole = quotient;
+    }
+    if (whole > 0) {
+      result.push(whole);
+    }
+    return mint(result);
+  }
+  // 큰 정수
+  if (Array.isArray(value)) {
+    return mint(value);
+  }
+}
+
+// 큰 정수 값을 자바스크립트 수로 변환, 값이 안전한 정수 범위 내에 있을 때만 변환이 정확함
+function number(big) {
+  let value = 0;
+  let the_sign = 1;
+  let factor = 1;
+  big.forEach(function (element, element_nr) {
+    if (element_nr === 0) {
+      if (element === minus) {
+        the_sign = -1;
+      }
+    } else {
+      value += element * factor;
+      factor *= radix;
+    }
+  });
+  return the_sign * value;
+}
