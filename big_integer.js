@@ -374,4 +374,37 @@ function add(augend, addend) {
   return mint(result);
 }
 
-function sub() {}
+function sub(minuend, subtrahend) {
+  if (is_zero(subtrahend)) {
+    return minuend;
+  }
+  if (is_zero(minuend)) {
+    return subtrahend;
+  }
+  let minuend_sign = minuend[sign];
+  // 피연산자의 부호가 다르면 더하기로 전환
+  if (minuend_sign !== subtrahend[sign]) {
+    return add(minuend, neg(subtrahend));
+  }
+  // 더 큰 수에서 작은 수를 뺀다.
+  if (abs_lt(minuend, subtrahend)) {
+    [subtrahend, minuend] = [minuend, subtrahend];
+    minuend_sign = minuend_sign === minus ? plus : minus;
+  }
+  let borrow = 0;
+  return mint(
+    minuend.map(function (element, element_nr) {
+      if (element_nr === sign) {
+        return minuend_sign;
+      }
+      let diff = element - ((subtrahend[element_nr] || 0) + borrow);
+      if (diff < 0) {
+        diff += 16777216;
+        borrow = 1;
+      } else {
+        borrow = 0;
+      }
+      return diff;
+    })
+  );
+}
