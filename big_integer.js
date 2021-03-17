@@ -644,3 +644,90 @@ function number(big) {
   });
   return the_sign * value;
 }
+
+// 큰 정수 값을 문자열로 변환
+function string(a, radix_2_thru_37 = 10) {
+  if (is_zero(a)) {
+    return "0";
+  }
+  radix_2_thru_37 = int(radix_2_thru_37);
+  if (
+    !Number.isSafeInteger(radix_2_thru_37) ||
+    radix_2_thru_37 < 2 ||
+    radix_2_thru_37 > 37
+  ) {
+    return undefined;
+  }
+  const radish = make(radix_2_thru_37);
+  const the_sign = a[sign] === minus ? "-" : "";
+  a = abs(a);
+  let digits = [];
+  while (!is_zero(a)) {
+    let [quotient, remainder] = divrem(a, radish);
+    digits.push(digitset[number(remainder)]);
+    a = quotient;
+  }
+  digits.push(the_sign);
+  return digits.reverse().join("");
+}
+
+// 큰 정수에서 값이 1인 비트 개수를 세어서 반환
+
+// 32비트 정수에서의 경우
+function population_32(int32) {
+  int32 -= (int32 >>> 1) & 0x55555555;
+  int32 = (int32 & 0x33333333) + ((int32 >>> 2) & 0x33333333);
+  int32 = (int32 + (int32 >>> 4)) & 0x0f0f0f0f;
+  int32 = (int32 + (int32 >>> 8)) & 0x001f001f;
+  return (int32 + (int32 >>> 16)) & 0x0000003f;
+}
+
+function population(big) {
+  return big.reduce(function (reduction, element, element_nr) {
+    return reduction + (element_nr === sign ? 0 : population_32(element));
+  }, 0);
+}
+
+// 앞쪽의 0들을 제외한 전체 비트 수를 반환
+function significant_bits(big) {
+  return big.length > 1
+    ? make((big.length - 2) * log2_radix + (32 - Math.clz32(last(big))))
+    : zero;
+}
+
+export default Object.freeze({
+  abs,
+  abs_lt,
+  add,
+  and,
+  div,
+  divrem,
+  eq,
+  gcd,
+  is_big_integer,
+  is_negative,
+  is_positive,
+  is_zero,
+  lt,
+  make,
+  mask,
+  mul,
+  neg,
+  not,
+  number,
+  or,
+  population,
+  power,
+  random,
+  shift_down,
+  shift_up,
+  significant_bits,
+  signum,
+  string,
+  sub,
+  ten,
+  two,
+  wun,
+  xor,
+  zero,
+});
